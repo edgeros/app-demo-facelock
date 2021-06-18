@@ -1,6 +1,6 @@
 {
     "name": "com.example.hanhui.facelock",
-    "version": "0.2.13",
+    "version": "0.2.15",
     "description": "EdgerOS Face Lock Testing",
     "main": "main.js",
     "scripts": {
