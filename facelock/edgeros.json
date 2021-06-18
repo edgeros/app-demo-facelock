@@ -1,0 +1,52 @@
+{
+    "name": "Face Lock",
+    "bundleid": "com.example.hanhui.facelock",
+    "ignore_modules": [
+        "@edgeros/eslint-plugin-jsre",
+        "@edgeros/jsre-types"
+    ],
+    "ignore_path": [
+        "./test/**",
+        "./temp/**"
+    ],
+    "assets": {
+        "ico_big": "assets/big.png",
+        "ico_small": "assets/small.png",
+        "ico_widget": "assets/widget.png",
+        "splash": "assets/splash.gif"
+    },
+    "program": {
+        "gss": false,
+        "log": "console",
+        "will": false,
+        "reside": false,
+        "mesv": "1.4.1"
+    },
+    "loading":{
+        "splash":"splash",
+        "background":"#000000",
+        "animation":"enlarge"
+    },
+    "vendor": {
+        "id": "10000",
+        "name": "ACOINFO",
+        "email": "hanhui@acoinfo.com",
+        "phone": "15313346535",
+        "fax": ""
+    },
+    "update": {
+        "remove": [
+            "public"
+        ]
+    },
+    "widget": [
+        {
+            "ico": "ico_widget",
+            "name": "My Widget",
+            "path": "widget",
+            "rows": 2,
+            "columns": 2,
+            "category": "Demo"
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "name": "com.example.hanhui.facelock",
+    "version": "0.2.13",
+    "description": "EdgerOS Face Lock Testing",
+    "main": "main.js",
+    "scripts": {
+        "build": "eos build"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "@edgeros/eslint-plugin-jsre": "^0.0.3",
+        "@edgeros/jsre-types": "^0.1.1",
+        "eslint": "^7.23.0"
+    },
+    "author": "hanhui@acoinfo.com"
+}

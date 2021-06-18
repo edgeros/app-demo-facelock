@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+	<link rel="icon" href="data:image/ico;base64,aWNv">
+	<link href="static/css/fonts.css" rel="stylesheet">
+	<link href="static/css/materialdesignicons.min.css" rel="stylesheet">
+	<link href="static/css/vuetify.min.css" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, viewport-fit=cover">
+	<title>Connector</title>
+</head>
+
+<body>
+	<div id="app">
+		<v-app><v-main><v-container>
+			<br/><br/>
+			<p>Response: {{ response }}</p><br/>
+			<p>Name: <v-text-field v-model="name"></v-text-field></p>
+			<v-switch v-model="cipher" inset :label="cipher ? '加密' : '明文'"></v-switch>
+			<v-row align="center" justify="space-around">
+				<v-btn elevation="2" color="primary" v-on:click="recv()">Shoot</v-btn>
+				<v-btn elevation="2" color="success" v-on:click="save()">Save</v-btn>
+				<v-btn elevation="2" v-on:click="remove()">Remove</v-btn>
+			</v-row>
+			<br/><br/><img :src="picture" width="100%"/>
+		</v-container></v-main></v-app>
+	</div>
+
+	<script src="static/js/sdk.min.js?v=2"></script>
+	<script src="static/js/vue.min.js?v=2"></script>
+	<script src="static/js/vuetify.min.js?v=2"></script>
+	<script src="static/js/synctable.min.js?v=2"></script>
+	<script src="static/js/axios.min.js?v=2"></script>
+	<script src="static/js/security.js?v=2"></script>
+
+	<script>
+		var bindings = {
+			data: {
+				response: '', cipher: false, picture: './default.jpg', name: ""
+			},
+			methods: {
+				recv: async function() {
+					try {
+						var reply = await link.fetch('recv', {
+							cipher: bindings.data.cipher
+						}, true, 4000);
+						bindings.data.response = reply.res;
+						if (reply.res === 'ok') {
+							bindings.data.picture = reply.file + `?t=${Date.now()}`;
+						} else {
+							edger.notify.error(`Recv error: ${reply.info}`);
+						}
+					} catch (error) {
+						edger.notify.error(`Fetch recv error: ${error}`);
+					}
+				},
+
+				save: async function() {
+					if (!bindings.data.name) {
+						edger.notify.error('No name input!');
+						return;
+					}
+					try {
+						var reply = await link.fetch('save', {
+							name: bindings.data.name
+						}, true, 4000);
+						bindings.data.response = reply.res;
+						if (reply.res === 'ok') {
+							edger.notify.success('Save ok!');
+						} else {
+							edger.notify.error(`Save error: ${reply.info}`);
+						}
+					} catch (error) {
+						edger.notify.error(`Fetch save error: ${error}`);
+					}
+				},
+
+				remove: async function() {
+					if (!bindings.data.name) {
+						edger.notify.error('No name input!');
+						return;
+					}
+					try {
+						var reply = await link.fetch('remove', {
+							name: bindings.data.name
+						}, true, 4000);
+						bindings.data.response = reply.res;
+						if (reply.res === 'ok') {
+							edger.notify.success('Remove ok!');
+						} else {
+							edger.notify.error(`Remove error: ${reply.info}`);
+						}
+					} catch (error) {
+						edger.notify.error(`Fetch remove error: ${error}`);
+					}
+				}
+			}
+		};
+
+		var vm = new Vue({
+			el: '#app',
+			vuetify: new Vuetify({
+				theme: { dark: false }
+			}),
+			data: bindings.data,
+			methods: bindings.methods
+		});
+
+		var link = null;
+		app.security.init(function() {
+			if (link == null) {
+				var proto = location.protocol === 'http:' ? 'ws:' : 'wss:';
+				var server = `${proto}//${window.location.host}`;
+				link = new SyncTable(server, 'main', app.security);
+
+				link.onmessage = function(event, arg) {
+					if (event === 'recv') {
+						if (arg.name) {
+							edger.notify.success(`Detect: ${arg.name}`);
+						}
+						bindings.data.picture = arg.file + `?t=${Date.now()}`;
+					}
+				}
+			}
+		});
+
+		edger.permission.fetch().then(perm => {
+			var code = [];
+			if (!perm.ainn) {
+				code.push('ainn');
+			}
+			if (!perm.network) {
+				code.push('network');
+			}
+			if (code.length) {
+				edger.permission.request({
+					code, type: 'permissions'
+				}).then(() => {
+					console.log('Request permisson!');
+				}).catch(error => {
+					console.error('Request permisson fail:', error);
+				});
+			}
+			if (perm.devices.length === 0) {
+				edger.notify.info('Please give related device permission.');
+			}
+		}).catch(error => {
+			console.error('Can not fetch permisson!', error);
+		});
+	</script>
+</body>
